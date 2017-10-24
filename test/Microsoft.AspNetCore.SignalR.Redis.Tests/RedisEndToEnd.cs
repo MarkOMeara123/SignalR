@@ -41,13 +41,13 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
 
         [ConditionalTheory]
         [SkipIfDockerNotPresent]
-        [MemberData(nameof(TransportTypesAndTransferModes))]
-        public async Task HubConnectionCanSendAndReceiveMessages(TransportType transportType, TransferMode requestedTransferMode)
+        [MemberData(nameof(TransportTypesAndProtocolTypes))]
+        public async Task HubConnectionCanSendAndReceiveMessages(TransportType transportType, Type protocolType)
         {
             using (StartLog(out var loggerFactory, testName:
-                $"{nameof(HubConnectionCanSendAndReceiveMessages)}_{transportType.ToString()}_{requestedTransferMode.ToString()}"))
+                $"{nameof(HubConnectionCanSendAndReceiveMessages)}_{transportType.ToString()}_{protocolType.Name}"))
             {
-                var connection = CreateConnection(_serverFixture.BaseUrl + "/echo", transportType, requestedTransferMode, loggerFactory);
+                var connection = CreateConnection(_serverFixture.BaseUrl + "/echo", transportType, protocolType, loggerFactory);
 
                 await connection.StartAsync().OrTimeout();
                 var str = await connection.InvokeAsync<string>("Echo", "Hello world").OrTimeout();
@@ -60,13 +60,13 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
 
         [ConditionalTheory]
         [SkipIfDockerNotPresent]
-        [MemberData(nameof(TransportTypesAndTransferModes))]
-        public async Task HubConnectionCanSendAndReceiveGroupMessages(TransportType transportType, TransferMode requestedTransferMode)
+        [MemberData(nameof(TransportTypesAndProtocolTypes))]
+        public async Task HubConnectionCanSendAndReceiveGroupMessages(TransportType transportType, Type protocolType)
         {
             using (StartLog(out var loggerFactory, testName:
-                $"{nameof(HubConnectionCanSendAndReceiveGroupMessages)}_{transportType.ToString()}_{requestedTransferMode.ToString()}"))
+                $"{nameof(HubConnectionCanSendAndReceiveGroupMessages)}_{transportType.ToString()}_{protocolType.Name}"))
             {
-                var connection = CreateConnection(_serverFixture.BaseUrl + "/echo", transportType, requestedTransferMode, loggerFactory);
+                var connection = CreateConnection(_serverFixture.BaseUrl + "/echo", transportType, protocolType, loggerFactory);
 
                 var tcs = new TaskCompletionSource<string>();
                 connection.On<string>("Echo", message => tcs.TrySetResult(message));
@@ -80,17 +80,17 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
             }
         }
 
-        private static HubConnection CreateConnection(string url, TransportType transportType, TransferMode transferMode, ILoggerFactory loggerFactory)
+        private static HubConnection CreateConnection(string url, TransportType transportType, Type protocolType, ILoggerFactory loggerFactory)
         {
             var builder = new HubConnectionBuilder()
                 .WithUrl(url)
                 .WithTransport(transportType)
                 .WithLoggerFactory(loggerFactory);
-            if (transferMode == TransferMode.Binary)
+            if (protocolType == typeof(MessagePackHubProtocol))
             {
                 builder.WithMessagePackProtocol();
             }
-            else if (transferMode == TransferMode.Text)
+            else if (protocolType == typeof(JsonHubProtocol))
             {
                 builder.WithJsonProtocol();
             }
@@ -111,14 +111,14 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
             }
         }
 
-        public static IEnumerable<object[]> TransportTypesAndTransferModes
+        public static IEnumerable<object[]> TransportTypesAndProtocolTypes
         {
             get
             {
                 foreach (var transport in TransportTypes)
                 {
-                    yield return new object[] { transport[0], TransferMode.Text };
-                    yield return new object[] { transport[0], TransferMode.Binary };
+                    yield return new object[] { transport[0], typeof(JsonHubProtocol) };
+                    yield return new object[] { transport[0], typeof(MessagePackHubProtocol) };
                 }
             }
         }
