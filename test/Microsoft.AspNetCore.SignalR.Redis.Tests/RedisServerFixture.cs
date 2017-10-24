@@ -20,12 +20,12 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
 
         public override void Dispose()
         {
+            base.Dispose();
+
             if (Docker.Default != null)
             {
                 Docker.Default.Stop(_logger);
             }
-
-            base.Dispose();
         }
     }
 }
