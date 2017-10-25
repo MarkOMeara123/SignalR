@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
             }
 
             var testLog = AssemblyTestLog.ForAssembly(typeof(RedisServerFixture<TStartup>).Assembly);
-            _logToken = testLog.StartTestLog(null, $"{nameof(RedisServerFixture<TStartup>)}_{typeof(TStartup).Name}", out _loggerFactory, "ServerFixture");
+            _logToken = testLog.StartTestLog(null, $"{nameof(RedisServerFixture<TStartup>)}_{typeof(TStartup).Name}", out _loggerFactory, "RedisServerFixture");
             _logger = _loggerFactory.CreateLogger<RedisServerFixture<TStartup>>();
 
             FirstServer = new ServerFixture<TStartup>();
