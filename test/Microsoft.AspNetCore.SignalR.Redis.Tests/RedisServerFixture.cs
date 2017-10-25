@@ -32,11 +32,10 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
 
         public void Dispose()
         {
-            FirstServer.Dispose();
-            SecondServer.Dispose();
-
             if (Docker.Default != null)
             {
+                FirstServer.Dispose();
+                SecondServer.Dispose();
                 Docker.Default.Stop(_logger);
             }
         }
