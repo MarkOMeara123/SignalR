@@ -4,6 +4,7 @@
 using System;
 using Microsoft.AspNetCore.SignalR.Tests.Common;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 
 namespace Microsoft.AspNetCore.SignalR.Redis.Tests
 {
@@ -13,7 +14,9 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
         public ServerFixture<TStartup> FirstServer { get; private set; }
         public ServerFixture<TStartup> SecondServer { get; private set; }
 
-        private ILogger _logger;
+        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly IDisposable _logToken;
 
         public RedisServerFixture()
         {
@@ -22,10 +25,12 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
                 return;
             }
 
+            var testLog = AssemblyTestLog.ForAssembly(typeof(RedisServerFixture<TStartup>).Assembly);
+            _logToken = testLog.StartTestLog(null, $"{nameof(RedisServerFixture<TStartup>)}_{typeof(TStartup).Name}", out _loggerFactory, "ServerFixture");
+            _logger = _loggerFactory.CreateLogger<RedisServerFixture<TStartup>>();
+
             FirstServer = new ServerFixture<TStartup>();
             SecondServer = new ServerFixture<TStartup>("http://localhost:3123");
-
-            _logger = FirstServer._logger;
 
             Docker.Default.Start(_logger);
         }
@@ -37,6 +42,7 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
                 FirstServer.Dispose();
                 SecondServer.Dispose();
                 Docker.Default.Stop(_logger);
+                _logToken.Dispose();
             }
         }
     }

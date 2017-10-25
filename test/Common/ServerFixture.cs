@@ -15,8 +15,8 @@ namespace Microsoft.AspNetCore.SignalR.Tests.Common
     public class ServerFixture<TStartup> : IDisposable
         where TStartup : class
     {
-        private ILoggerFactory _loggerFactory;
-        internal ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger _logger;
         private IWebHost _host;
         private IApplicationLifetime _lifetime;
         private readonly IDisposable _logToken;
@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.SignalR.Tests.Common
             });
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
             _logger.LogInformation("Shutting down test server");
             _host.Dispose();
