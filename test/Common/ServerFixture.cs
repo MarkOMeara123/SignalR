@@ -21,26 +21,33 @@ namespace Microsoft.AspNetCore.SignalR.Tests.Common
         private IApplicationLifetime _lifetime;
         private readonly IDisposable _logToken;
 
-        public string BaseUrl => "http://localhost:3000";
+        public static string BaseUrl => "http://localhost:3000";
 
         public string WebSocketsUrl => BaseUrl.Replace("http", "ws");
 
-        public ServerFixture()
-        {
-            var testLog = AssemblyTestLog.ForAssembly(typeof(ServerFixture<TStartup>).Assembly);
-            _logToken = testLog.StartTestLog(null, $"{nameof(ServerFixture<TStartup>)}_{typeof(TStartup).Name}" , out _loggerFactory, "ServerFixture");
-            _logger = _loggerFactory.CreateLogger<ServerFixture<TStartup>>();
+        public string Url { get; private set; }
 
-            StartServer();
+        public ServerFixture() : this(BaseUrl)
+        {
         }
 
-        private void StartServer()
+        public ServerFixture(string url)
+        {
+            var testLog = AssemblyTestLog.ForAssembly(typeof(ServerFixture<TStartup>).Assembly);
+            _logToken = testLog.StartTestLog(null, $"{nameof(ServerFixture<TStartup>)}_{typeof(TStartup).Name}", out _loggerFactory, "ServerFixture");
+            _logger = _loggerFactory.CreateLogger<ServerFixture<TStartup>>();
+
+            Url = url;
+            StartServer(url);
+        }
+
+        private void StartServer(string url)
         {
             _host = new WebHostBuilder()
                 .ConfigureLogging(builder => builder.AddProvider(new ForwardingLoggerProvider(_loggerFactory)))
                 .UseStartup(typeof(TStartup))
                 .UseKestrel()
-                .UseUrls(BaseUrl)
+                .UseUrls(url)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .Build();
 

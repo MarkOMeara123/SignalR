@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.SignalR.Internal.Protocol;
 using Microsoft.AspNetCore.SignalR.Tests.Common;
 using Microsoft.AspNetCore.Sockets;
-using Microsoft.AspNetCore.Sockets.Client;
-using Microsoft.AspNetCore.Sockets.Features;
 using Microsoft.AspNetCore.Testing.xunit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
@@ -47,7 +45,7 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
             using (StartLog(out var loggerFactory, testName:
                 $"{nameof(HubConnectionCanSendAndReceiveMessages)}_{transportType.ToString()}_{protocolType.Name}"))
             {
-                var connection = CreateConnection(_serverFixture.BaseUrl + "/echo", transportType, protocolType, loggerFactory);
+                var connection = CreateConnection(_serverFixture.FirstServer.Url + "/echo", transportType, protocolType, loggerFactory);
 
                 await connection.StartAsync().OrTimeout();
                 var str = await connection.InvokeAsync<string>("Echo", "Hello world").OrTimeout();
@@ -66,15 +64,20 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
             using (StartLog(out var loggerFactory, testName:
                 $"{nameof(HubConnectionCanSendAndReceiveGroupMessages)}_{transportType.ToString()}_{protocolType.Name}"))
             {
-                var connection = CreateConnection(_serverFixture.BaseUrl + "/echo", transportType, protocolType, loggerFactory);
+                var connection = CreateConnection(_serverFixture.FirstServer.Url + "/echo", transportType, protocolType, loggerFactory);
+                var secondConnection = CreateConnection(_serverFixture.SecondServer.Url + "/echo", transportType, protocolType, loggerFactory);
 
                 var tcs = new TaskCompletionSource<string>();
                 connection.On<string>("Echo", message => tcs.TrySetResult(message));
+                var tcs2 = new TaskCompletionSource<string>();
+                secondConnection.On<string>("Echo", message => tcs2.TrySetResult(message));
 
+                await secondConnection.StartAsync().OrTimeout();
                 await connection.StartAsync().OrTimeout();
                 await connection.InvokeAsync("EchoGroup", "Test", "Hello world").OrTimeout();
 
                 Assert.Equal("Hello world", await tcs.Task.OrTimeout());
+                Assert.Equal("Hello world", await tcs2.Task.OrTimeout());
 
                 await connection.DisposeAsync().OrTimeout();
             }

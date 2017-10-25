@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
             using (StartLog(out var loggerFactory))
             {
                 var connection = new HubConnectionBuilder()
-                    .WithUrl(_serverFixture.BaseUrl + path)
+                    .WithUrl(_serverFixture.Url + path)
                     .WithTransport(transportType)
                     .WithLoggerFactory(loggerFactory)
                     .WithHubProtocol(protocol)
@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
             using (StartLog(out var loggerFactory))
             {
                 const string originalMessage = "SignalR";
-                var httpConnection = new HttpConnection(new Uri(_serverFixture.BaseUrl + path), transportType, loggerFactory);
+                var httpConnection = new HttpConnection(new Uri(_serverFixture.Url + path), transportType, loggerFactory);
                 var connection = new HubConnection(httpConnection, protocol, loggerFactory);
                 try
                 {
@@ -108,7 +108,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
             {
                 const string originalMessage = "SignalR";
                 var uriString = "http://test/" + path;
-                var httpConnection = new HttpConnection(new Uri(_serverFixture.BaseUrl + path), transportType, loggerFactory);
+                var httpConnection = new HttpConnection(new Uri(_serverFixture.Url + path), transportType, loggerFactory);
                 var connection = new HubConnection(httpConnection, protocol, loggerFactory);
                 try
                 {
@@ -138,7 +138,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
             {
                 const string originalMessage = "SignalR";
 
-                var httpConnection = new HttpConnection(new Uri(_serverFixture.BaseUrl + path), transportType, loggerFactory);
+                var httpConnection = new HttpConnection(new Uri(_serverFixture.Url + path), transportType, loggerFactory);
                 var connection = new HubConnection(httpConnection, protocol, loggerFactory);
                 try
                 {
@@ -169,7 +169,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
         {
             using (StartLog(out var loggerFactory))
             {
-                var httpConnection = new HttpConnection(new Uri(_serverFixture.BaseUrl + path), transportType, loggerFactory);
+                var httpConnection = new HttpConnection(new Uri(_serverFixture.Url + path), transportType, loggerFactory);
                 var connection = new HubConnection(httpConnection, protocol, loggerFactory);
                 try
                 {
@@ -204,7 +204,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
         {
             using (StartLog(out var loggerFactory))
             {
-                var httpConnection = new HttpConnection(new Uri(_serverFixture.BaseUrl + path), transportType, loggerFactory);
+                var httpConnection = new HttpConnection(new Uri(_serverFixture.Url + path), transportType, loggerFactory);
                 var connection = new HubConnection(httpConnection, protocol, loggerFactory);
                 try
                 {
@@ -233,7 +233,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
         {
             using (StartLog(out var loggerFactory))
             {
-                var httpConnection = new HttpConnection(new Uri(_serverFixture.BaseUrl + path), transportType, loggerFactory);
+                var httpConnection = new HttpConnection(new Uri(_serverFixture.Url + path), transportType, loggerFactory);
                 var connection = new HubConnection(httpConnection, protocol, loggerFactory);
                 try
                 {
@@ -268,7 +268,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
         {
             using (StartLog(out var loggerFactory))
             {
-                var httpConnection = new HttpConnection(new Uri(_serverFixture.BaseUrl + path), transportType, loggerFactory);
+                var httpConnection = new HttpConnection(new Uri(_serverFixture.Url + path), transportType, loggerFactory);
                 var connection = new HubConnection(httpConnection, protocol, loggerFactory);
                 try
                 {
@@ -299,7 +299,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
         {
             using (StartLog(out var loggerFactory))
             {
-                var httpConnection = new HttpConnection(new Uri(_serverFixture.BaseUrl + path), transportType, loggerFactory);
+                var httpConnection = new HttpConnection(new Uri(_serverFixture.Url + path), transportType, loggerFactory);
                 var connection = new HubConnection(httpConnection, protocol, loggerFactory);
                 try
                 {
@@ -327,7 +327,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
         {
             using (StartLog(out var loggerFactory))
             {
-                var httpConnection = new HttpConnection(new Uri(_serverFixture.BaseUrl + hubPath), transportType, loggerFactory);
+                var httpConnection = new HttpConnection(new Uri(_serverFixture.Url + hubPath), transportType, loggerFactory);
                 var connection = new HubConnection(httpConnection, hubProtocol, loggerFactory);
                 try
                 {
