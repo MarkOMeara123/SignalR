@@ -20,6 +20,8 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
 
         public RedisServerFixture()
         {
+            // Docker is not available on the machine, tests using this fixture
+            // should be using SkipIfDockerNotPresentAttribute and will be skipped.
             if (Docker.Default == null)
             {
                 return;
@@ -29,10 +31,23 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
             _logToken = testLog.StartTestLog(null, $"{nameof(RedisServerFixture<TStartup>)}_{typeof(TStartup).Name}", out _loggerFactory, "RedisServerFixture");
             _logger = _loggerFactory.CreateLogger<RedisServerFixture<TStartup>>();
 
-            FirstServer = new ServerFixture<TStartup>();
-            SecondServer = new ServerFixture<TStartup>("http://localhost:3123");
+            FirstServer = StartServer("http://localhost:3001");
+            SecondServer = StartServer("http://localhost:3002");
 
             Docker.Default.Start(_logger);
+        }
+
+        private ServerFixture<TStartup> StartServer(string url)
+        {
+            try
+            {
+                return new ServerFixture<TStartup>(url);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Server failed to start.");
+                throw;
+            }
         }
 
         public void Dispose()

@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.SignalR.Tests.Common
         private IApplicationLifetime _lifetime;
         private readonly IDisposable _logToken;
 
-        public static string BaseUrl => "http://localhost:3000";
+        private const string BaseUrl = "http://localhost:3000";
 
         public string WebSocketsUrl => BaseUrl.Replace("http", "ws");
 

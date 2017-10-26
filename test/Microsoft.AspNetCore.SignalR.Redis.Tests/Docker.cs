@@ -18,7 +18,8 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
 
         public static Docker Default => _instance.Value;
 
-        private string _path;
+        private readonly string _path;
+
         public Docker(string path)
         {
             _path = path;
@@ -27,7 +28,7 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
         private static Docker Create()
         {
             // Currently Windows Server 2016 doesn't support linux containers which redis is.
-            if (string.Equals("True", Environment.GetEnvironmentVariable("APPVEYOR")))
+            if (string.Equals("True", Environment.GetEnvironmentVariable("APPVEYOR"), StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
@@ -68,9 +69,9 @@ namespace Microsoft.AspNetCore.SignalR.Redis.Tests
 
         private static int RunProcess(string fileName, string arugments, ILogger logger)
         {
-            var process = new Process()
+            var process = new Process
             {
-                StartInfo = new ProcessStartInfo()
+                StartInfo = new ProcessStartInfo
                 {
                     FileName = fileName,
                     Arguments = arugments,
