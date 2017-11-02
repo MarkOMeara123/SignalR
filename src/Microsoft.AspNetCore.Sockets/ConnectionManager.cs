@@ -66,6 +66,8 @@ namespace Microsoft.AspNetCore.Sockets
             var applicationSide = ChannelConnection.Create<byte[]>(transportToApplication, applicationToTransport);
 
             var connection = new DefaultConnectionContext(id, applicationSide, transportSide);
+            var connectionTimer = SocketEventSource.Log.ConnectionStart(id);
+            connection._connectionTimer = connectionTimer;
 
             _connections.TryAdd(id, connection);
             return connection;
@@ -73,9 +75,10 @@ namespace Microsoft.AspNetCore.Sockets
 
         public void RemoveConnection(string id)
         {
-            if (_connections.TryRemove(id, out _))
+            if (_connections.TryRemove(id, out var connection))
             {
                 // Remove the connection completely
+                SocketEventSource.Log.ConnectionStop(id, connection._connectionTimer);
                 _logger.RemovedConnection(id);
             }
         }
@@ -135,6 +138,7 @@ namespace Microsoft.AspNetCore.Sockets
                     // Once the decision has been made to dispose we don't check the status again
                     if (status == DefaultConnectionContext.ConnectionStatus.Inactive && (DateTimeOffset.UtcNow - lastSeenUtc).TotalSeconds > 5)
                     {
+                        SocketEventSource.Log.ConnectionTimedOut(c.Value.ConnectionId);
                         var ignore = DisposeAndRemoveAsync(c.Value);
                     }
                 }
