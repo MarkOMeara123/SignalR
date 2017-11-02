@@ -11,16 +11,16 @@ namespace Microsoft.AspNetCore.Sockets.Internal
     {
         public static readonly SocketEventSource Log = new SocketEventSource();
 
-        private readonly EventCounter _connectionsStartedCounter;
-        private readonly EventCounter _connectionsStoppedCounter;
-        private readonly EventCounter _connectionsTimedOutCounter;
+        private readonly EventCounter _connectionsStarted;
+        private readonly EventCounter _connectionsStopped;
+        private readonly EventCounter _connectionsTimedOut;
         private readonly EventCounter _connectionDuration;
 
         private SocketEventSource()
         {
-            _connectionsStartedCounter = new EventCounter("ConnectionsStarted", this);
-            _connectionsStoppedCounter = new EventCounter("ConnectionsStopped", this);
-            _connectionsTimedOutCounter = new EventCounter("ConnectionsTimedOut", this);
+            _connectionsStarted = new EventCounter("ConnectionsStarted", this);
+            _connectionsStopped = new EventCounter("ConnectionsStopped", this);
+            _connectionsTimedOut = new EventCounter("ConnectionsTimedOut", this);
             _connectionDuration = new EventCounter("ConnectionDuration", this);
         }
 
@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.Sockets.Internal
             {
                 var duration = timer.IsActive ? timer.GetElapsedTime().TotalMilliseconds : 0.0;
                 _connectionDuration.WriteMetric((float)duration);
-                _connectionsStoppedCounter.WriteMetric(1.0f);
+                _connectionsStopped.WriteMetric(1.0f);
 
                 if (IsEnabled(EventLevel.Informational, EventKeywords.None))
                 {
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.Sockets.Internal
         {
             if (IsEnabled())
             {
-                _connectionsStartedCounter.WriteMetric(1.0f);
+                _connectionsStarted.WriteMetric(1.0f);
 
                 if (IsEnabled(EventLevel.Informational, EventKeywords.None))
                 {
@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.Sockets.Internal
         {
             if (IsEnabled())
             {
-                _connectionsTimedOutCounter.WriteMetric(1.0f);
+                _connectionsTimedOut.WriteMetric(1.0f);
 
                 if (IsEnabled(EventLevel.Informational, EventKeywords.None))
                 {
