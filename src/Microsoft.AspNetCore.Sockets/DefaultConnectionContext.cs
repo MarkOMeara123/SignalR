@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.Sockets
         // This tcs exists so that multiple calls to DisposeAsync all wait asynchronously
         // on the same task
         private TaskCompletionSource<object> _disposeTcs = new TaskCompletionSource<object>();
-        internal ValueStopwatch _connectionTimer;
+        internal ValueStopwatch ConnectionTimer { get; set; }
 
         public DefaultConnectionContext(string id, Channel<byte[]> transport, Channel<byte[]> application)
         {
