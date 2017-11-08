@@ -1,11 +1,11 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Channels;
+using System.Threading.Channels;
 
 namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
 {
@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
 
         public IObservable<int> Stream(int count) => TestHubMethodsImpl.Stream(count);
 
-        public ReadableChannel<int> StreamException() => TestHubMethodsImpl.StreamException();
+        public ChannelReader<int> StreamException() => TestHubMethodsImpl.StreamException();
 
         public async Task CallEcho(string message)
         {
@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
 
         public IObservable<int> Stream(int count) => TestHubMethodsImpl.Stream(count);
 
-        public ReadableChannel<int> StreamException() => TestHubMethodsImpl.StreamException();
+        public ChannelReader<int> StreamException() => TestHubMethodsImpl.StreamException();
 
         public async Task CallEcho(string message)
         {
@@ -59,7 +59,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
 
         public IObservable<int> Stream(int count) => TestHubMethodsImpl.Stream(count);
 
-        public ReadableChannel<int> StreamException() => TestHubMethodsImpl.StreamException();
+        public ChannelReader<int> StreamException() => TestHubMethodsImpl.StreamException();
 
         public async Task CallEcho(string message)
         {
@@ -91,7 +91,7 @@ namespace Microsoft.AspNetCore.SignalR.Client.FunctionalTests
                              .Take(count);
         }
 
-        public static ReadableChannel<int> StreamException()
+        public static ChannelReader<int> StreamException()
         {
             throw new InvalidOperationException("Error occurred while streaming.");
         }

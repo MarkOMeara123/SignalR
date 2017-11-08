@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Channels;
+using System.Threading.Channels;
 using Microsoft.AspNetCore.SignalR.Client.Internal;
 using Microsoft.AspNetCore.SignalR.Internal.Protocol;
 using Microsoft.Extensions.Logging;
@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.SignalR.Client
         }
 
         public static InvocationRequest Stream(CancellationToken cancellationToken, Type resultType, string invocationId,
-            ILoggerFactory loggerFactory, HubConnection hubConnection, out ReadableChannel<object> result)
+            ILoggerFactory loggerFactory, HubConnection hubConnection, out ChannelReader<object> result)
         {
             var req = new Streaming(cancellationToken, resultType, invocationId, loggerFactory, hubConnection);
             result = req.Result;
@@ -76,7 +76,7 @@ namespace Microsoft.AspNetCore.SignalR.Client
             {
             }
 
-            public ReadableChannel<object> Result => _channel.In;
+            public ChannelReader<object> Result => _channel.Reader;
 
             public override void Complete(HubMessage message)
             {
@@ -98,22 +98,22 @@ namespace Microsoft.AspNetCore.SignalR.Client
                 }
 
                 Logger.InvocationCompleted(InvocationId);
-                _channel.Out.TryComplete();
+                _channel.Writer.TryComplete();
             }
 
             public override void Fail(Exception exception)
             {
                 Logger.InvocationFailed(InvocationId);
-                _channel.Out.TryComplete(exception);
+                _channel.Writer.TryComplete(exception);
             }
 
             public override async ValueTask<bool> StreamItem(object item)
             {
                 try
                 {
-                    while (!_channel.Out.TryWrite(item))
+                    while (!_channel.Writer.TryWrite(item))
                     {
-                        if (!await _channel.Out.WaitToWriteAsync())
+                        if (!await _channel.Writer.WaitToWriteAsync())
                         {
                             return false;
                         }
@@ -128,7 +128,7 @@ namespace Microsoft.AspNetCore.SignalR.Client
 
             protected override void Cancel()
             {
-                _channel.Out.TryComplete(new OperationCanceledException("Invocation terminated"));
+                _channel.Writer.TryComplete(new OperationCanceledException("Invocation terminated"));
             }
         }
 
